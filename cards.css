@@ -1,0 +1,496 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap');
+/* -------------------------------------------------------
+   GLOBAL LAYOUT
+------------------------------------------------------- */
+:root {
+    --surface-background: #eeeeee;   /* Page background */
+    --surface-panel: #ffffff;        /* Card backgrounds */
+    --surface-header: #0F1820;       /* Header background */
+
+    --opaque: #000;
+    --grey: #333333;         /* Main text */
+    --lightGrey: #b8c4d1;       /* Subtle UI text */
+    --white: #ffffff;       
+    
+    --primary: #0F1820;     /* Main accent colour (dark blue) */
+    --accent: #003cff;       /* Blue highlight colour */
+
+    --border-soft: rgba(0,0,0,0.08); /* Light borders */
+    --border-strong: rgba(0,0,0,0.15);
+
+    --button-surface: #1c2a36;
+    --button-surface-hover: #263544;
+    --button-border: #2f3f4f;
+    --button-border-hover: #3d4f63;
+    --card-header-text: #fff;
+}
+
+
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--surface-background);
+    color: var(--opaque);
+    padding: 0;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: 0.1px;
+}
+
+/* -------------------------------------------------------
+   CARD CONTAINER GRID BACKGROUND
+------------------------------------------------------- */
+
+#card-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+
+    /* Full‑bleed grid */
+    background-image:
+        linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: center;
+    padding: 0; /* Remove padding here */
+    min-height: 100vh;;
+}
+
+#card-inner {
+    padding: 20px; /* Padding moved here */
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    gap: 20px;
+}
+
+.card-header {
+    background: var(--primary);
+    color: var(--card-header-text);
+    padding: 12px;
+    margin: -14px -14px 12px -14px;
+    border-bottom: 1px solid var(--border-soft);
+}
+
+
+/* -------------------------------------------------------
+   ADEPTUS MINIMUS HEADER
+------------------------------------------------------- */
+
+.site-header {
+    width: 100%;
+    background: #0F1820;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    position: relative;
+    overflow: hidden;
+    color: #fff;
+}
+
+/* Subtle grain overlay */
+.site-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23noise)' opacity='0.2'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    opacity: 0.5;
+}
+
+
+.header-inner {
+    margin: 0 auto;
+    text-align: center;
+}
+
+.site-title {
+    font-family: "Oswald", sans-serif;
+    font-weight: 800;
+    font-size: 36px;
+    margin: 0;
+    letter-spacing: -0.5px;
+     /* Subtle blue gradient */
+}
+
+.site-tagline {
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    margin-top: 6px;
+    margin-bottom: 20px;
+}
+
+.header-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* File input + buttons */
+#fileInput, .file-button,
+#downloadBtn,
+#download-pdf {
+    background: var(--button-bg);
+    color: var(--white);
+    border: 1px solid var(--button-border);
+    padding: 10px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: "Oswald", sans-serif;
+    letter-spacing: 0.5px;
+
+    /* Inner glow */
+    box-shadow:
+        inset 0 0 8px rgba(120,152,255,0.25),
+        0 0 6px rgba(0,0,0,0.4);
+
+    transition:
+        box-shadow 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+#fileInput:hover, .file-button:hover,
+#downloadBtn:hover,
+#download-pdf:hover {
+    border-color: var(--light-blue);
+    color: var(--light-blue);
+
+    /* Stronger glow on hover */
+    box-shadow:
+        inset 0 0 12px rgba(120,152,255,0.45),
+        0 0 10px rgba(120,152,255,0.25);
+}
+
+/* Hide the real input */
+.file-upload input[type="file"] {
+    display: none;
+}
+
+/* Wrapper */
+.file-upload {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+/* The custom button */
+
+
+
+
+.card-placeholder {
+    text-align: center;
+    max-width: 500px;
+    margin: 60px auto;
+    padding: 20px;
+    color: var(--text-secondary);
+    font-family: "Inter", sans-serif;
+    line-height: 1.5;
+}
+
+.card-placeholder h3 {
+    font-family: "Oswald", sans-serif;
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: var(--primary);
+}
+
+
+/* -------------------------------------------------------
+   CARD CONTAINER
+------------------------------------------------------- */
+
+.card {
+    width: 320px;
+    max-height: 700px;
+    background: white;
+    padding: 14px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* -------------------------------------------------------
+   UNIT HEADER + BADGES
+------------------------------------------------------- */
+
+.unit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.unit-header h2 {
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+    font-family: "Oswald", sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    /* Inter SemiBold */
+    color: var(--card-header-text);
+}
+
+.unit-badges {
+    display: flex;
+    margin: 0;
+    gap: 6px;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.invuln-box,
+.fnp-box {
+    font-size: 14px;
+    font-weight: 600;
+    padding: 2px 5px;
+    line-height: 1;
+    border: 1px solid;
+}
+
+.invuln-box, .fnp-box {
+    color: var(--card-header-text);
+    border-color: #00a2ff;
+    box-shadow:
+        inset 0 0 20px rgba(120,152,255,0.25),
+        0 0 6px rgba(0,0,0,0.4);
+}
+/* -------------------------------------------------------
+   SECTION HEADERS (Unified style)
+------------------------------------------------------- */
+
+.section-title,
+.weapon-subtitle {
+    font-weight: 600;
+    font-size: 12px;
+    margin-top: 8px;
+    color: #333;
+}
+
+/* -------------------------------------------------------
+   SECTION SEPARATOR
+------------------------------------------------------- */
+
+.section-separator {
+    margin-top: 10px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* -------------------------------------------------------
+   MODEL NAMES
+------------------------------------------------------- */
+
+.model-name {
+    font-size: 10px;
+    font-weight: 600;
+    margin-top: 6px;
+    margin-bottom: 2px;
+    color: #333;
+}
+
+/* -------------------------------------------------------
+   CHARACTERISTICS
+------------------------------------------------------- */
+
+.stat-header {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 2px;
+}
+
+.stat-block {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 3px;
+    margin-top: 0;
+    font-size: 12px;
+    font-family: 'inter tight', sans-serif;
+    font-weight: 700   ;
+}
+
+.stat-block div {
+    background: #eee;
+    color: var(--primary);
+    padding: 3px;
+    text-align: center;
+}
+
+
+/* -------------------------------------------------------
+   WEAPONS
+------------------------------------------------------- */
+
+.weapon-block {
+    font-size: 11px;
+    margin-top: 6px;
+    margin-bottom: 10px;
+}
+
+/* Header row with stat labels */
+.weapon-header {
+    display: grid;
+    grid-template-columns:
+        1fr repeat(6, minmax(28px, auto));
+    gap: 2px;
+    font-size: 10px;
+    color: #666;
+    margin-top: 8px;
+    margin-bottom: 4px;
+    align-items: center;
+}
+
+.weapon-header .wh-title {
+    font-weight: 600;
+    font-size: 12px;
+    color: #333;
+}
+
+.weapon-header .wh-stat {
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* Parent weapon name */
+.weapon-parent {
+    font-size: 11px;
+    color: #333;
+    margin-top: 6px;
+    margin-bottom: 2px;
+}
+
+/* Weapon name (single + profile) */
+.wp-name {
+    font-size: 11px;
+    color: #333;
+}
+
+/* Inline keywords */
+.wp-keywords-inline {
+    font-family: "Inter Tight", sans-serif;
+    font-size: 9px;
+    color: var(--accent);
+    margin-left: 4px;
+}
+
+.wp-keyword {
+    white-space: nowrap;
+}
+
+
+/* Inline weapon rows */
+.weapon-inline-row {
+    display: grid;
+    grid-template-columns:
+        1fr repeat(6, minmax(28px, auto));
+    gap: 2px;
+    align-items: center;
+    margin-bottom: 2px;
+}
+
+.weapon-inline-row .wp-stat {
+    text-align: center;
+    background: #eee;
+    border-radius: 3px;
+    padding: 2px 1px;
+    font-size: 10px;
+    white-space: nowrap;
+    font-family: 'inter tight', sans-serif;
+     font-weight: 600;
+}
+
+
+/* -------------------------------------------------------
+   KEYWORDS (italic, no title)
+------------------------------------------------------- */
+
+.keywords-text {
+    font-size: 11px;
+    line-height: 1.2;
+    margin-top: 2px;
+    font-style: italic;
+}
+
+/* -------------------------------------------------------
+   INLINE SECTIONS (Abilities, Wargear, Enhancements)
+------------------------------------------------------- */
+
+.inline-section {
+    font-size: 11px;
+    margin-top: 6px;
+    line-height: 1.3;
+}
+
+.inline-section span {
+    white-space: nowrap;
+}
+
+.inline-title {
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    margin-right: 4px;
+    color: #000;
+}
+
+.ability-unique {
+    font-weight: 600;
+    color: #333;
+}
+
+.ability-generic {
+    font-weight: 400;
+    color: #333;
+}
+
+
+/* -------------------------------------------------------
+   LOADING OVERLAY
+------------------------------------------------------- */
+
+#loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 24, 32, 0.85); /* matches header tone */
+    backdrop-filter: blur(2px);
+    display: none; /* hidden by default */
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-content {
+    text-align: center;
+    color: #e6eef5;
+    font-family: "Inter Tight", sans-serif;
+}
+
+.loading-cog {
+    font-size: 48px;
+    opacity: 0.9;
+    animation: cog-spin 2s linear infinite;
+    margin-bottom: 10px;
+}
+
+.loading-text {
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    opacity: 0.9;
+}
+
+/* Cog rotation animation */
+@keyframes cog-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
