@@ -252,6 +252,7 @@ body {
 
 .invuln-box,
 .fnp-box {
+    white-space: nowrap;
     font-size: 14px;
     font-weight: 600;
     padding: 2px 5px;
