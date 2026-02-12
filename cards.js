@@ -1,4 +1,19 @@
 // Weapon keyword shorthand map
+
+function cleanDescription(text) {
+    if (!text) return "";
+
+    return text
+        // Remove ^^ markers
+        .replace(/\^\^/g, "")
+        // Remove **bold** markers
+        .replace(/\*\*/g, "")
+        // Remove __underline__ markers (just in case)
+        .replace(/__/g, "")
+        // Trim leftover whitespace
+        .trim();
+}
+
 const keywordShorthand = {
     "Assault": "As",
     "Rapid Fire": "RF",
@@ -17,7 +32,7 @@ const keywordShorthand = {
     "Devastating Wounds": "Dev",
     "Sustained Hits": "Sus",
     "Extra Attacks": "EA",
-    "Anti": "A", // Anti-Infantry 4+ → A‑4+
+    "Anti": "A",
     "One Shot": "OS",
     "Psychic": "Psy",
     "Conversion": "Cv"
@@ -26,12 +41,10 @@ const keywordShorthand = {
 function convertKeywordToShorthand(keyword) {
     keyword = keyword.trim();
 
-    // --- Anti-Keyword X+ ---
     if (keyword.startsWith("Anti-")) {
-        // Normalise weird hyphens and whitespace
         let rest = keyword.replace("Anti-", "")
-            .replace(/\u2011|\u2012|\u2013|\u2014/g, "-") // convert unicode hyphens
-            .replace(/\s+/g, " ")                        // collapse whitespace
+            .replace(/\u2011|\u2012|\u2013|\u2014/g, "-")
+            .replace(/\s+/g, " ")
             .trim();
 
         const parts = rest.split(" ").filter(p => p.length);
@@ -39,7 +52,6 @@ function convertKeywordToShorthand(keyword) {
         const target = parts[0];
         let value = parts[1] || "";
 
-        // Remove ALL leading punctuation (hyphens, en-dashes, em-dashes)
         value = value.replace(/^[\-\u2011\u2012\u2013\u2014]+/, "");
 
         const targetMap = {
@@ -59,10 +71,6 @@ function convertKeywordToShorthand(keyword) {
         return value ? `A-${letter}${value}` : `A-${letter}`;
     }
 
-
-
-
-    // --- Keywords with numbers (Rapid Fire 2, Melta 2, SH 1, etc.) ---
     const match = keyword.match(/^(.*?)(\d[\d\+]*)$/);
     if (match) {
         const base = match[1].trim();
@@ -71,7 +79,6 @@ function convertKeywordToShorthand(keyword) {
         return `${code}-${num}`;
     }
 
-    // --- Simple keywords ---
     return keywordShorthand[keyword] || keyword;
 }
 
@@ -84,31 +91,23 @@ function renderCards(data) {
         card.className = "card";
 
         // -------------------------------------------------------
-        // 1. NAME
+        // 1. NAME + BADGES
         // -------------------------------------------------------
 
-        // Find invulnerable save in unique abilities
         let invuln = null;
-
         unit.uniqueAbilities.forEach(a => {
-            const match = a.match(/Invulnerable Save\s*(\d\+)/i);
+            const match = a.name.match(/Invulnerable Save\s*(\d\+)/i);
             if (match) invuln = match[1];
         });
 
-
-        // Find Feel No Pain value (prefer unique abilities)
         let fnp = null;
-
-        // 1. Check unique abilities first (these contain the value)
         unit.uniqueAbilities.forEach(a => {
-            const match = a.match(/Feel No Pain\s*(\d\+)/i);
+            const match = a.name.match(/Feel No Pain\s*(\d\+)/i);
             if (match) fnp = match[1];
         });
-
-        // 2. If still null, check generic abilities (rare but possible)
         if (!fnp) {
             unit.genericAbilities.forEach(a => {
-                const match = a.match(/Feel No Pain\s*(\d\+)/i);
+                const match = a.name.match(/Feel No Pain\s*(\d\+)/i);
                 if (match) fnp = match[1];
             });
         }
@@ -122,30 +121,36 @@ function renderCards(data) {
                         ${fnp ? `<div class="fnp-box">${fnp}++</div>` : ""}
                     </div>
                 </div>
-`;
-headerHTML += `</div>`; // close .card-header
+            </div>
+        `;
+
+        card.innerHTML += headerHTML;
+
+        // -------------------------------------------------------
+        // 2. CHARACTERISTICS
+        // -------------------------------------------------------
+
         const showNames = unit.characteristics.length > 1;
 
         unit.characteristics.forEach((profile, index) => {
-
             if (showNames) {
-                headerHTML += `<div class="model-name">${profile.name}</div>`;
+                card.innerHTML += `<div class="model-name">${profile.name}</div>`;
             }
 
             if (index === 0) {
-                headerHTML += `
-            <div class="stat-header">
-                <div>M</div>
-                <div>T</div>
-                <div>SV</div>
-                <div>W</div>
-                <div>LD</div>
-                <div>OC</div>
-            </div>
-        `;
+                card.innerHTML += `
+                    <div class="stat-header">
+                        <div>M</div>
+                        <div>T</div>
+                        <div>SV</div>
+                        <div>W</div>
+                        <div>LD</div>
+                        <div>OC</div>
+                    </div>
+                `;
             }
 
-            headerHTML += `
+            card.innerHTML += `
                 <div class="stat-block">
                     <div>${profile.M}</div>
                     <div>${profile.T}</div>
@@ -157,20 +162,14 @@ headerHTML += `</div>`; // close .card-header
             `;
         });
 
-        
-
-        card.innerHTML += headerHTML;
-
-
-        // Separator after characteristics
         card.innerHTML += `<div class="section-separator"></div>`;
 
         // -------------------------------------------------------
-        // 3. WEAPONS (ranged + melee split)
+        // 3. WEAPONS
         // -------------------------------------------------------
+
         if (unit.weapons.length > 0) {
 
-            // Split weapons
             const ranged = [];
             const melee = [];
 
@@ -179,7 +178,6 @@ headerHTML += `</div>`; // close .card-header
                 else ranged.push(w);
             });
 
-            // Group by base name
             function groupWeapons(list) {
                 const groups = {};
                 list.forEach(w => {
@@ -196,14 +194,10 @@ headerHTML += `</div>`; // close .card-header
             const rangedGroups = groupWeapons(ranged);
             const meleeGroups = groupWeapons(melee);
 
-            // NEW: helper to render keyword spans
             function renderKeywordSpans(keywordString) {
                 if (!keywordString || keywordString === "-") return "";
 
-                // Split by comma, trim
                 const parts = keywordString.split(",").map(k => k.trim()).filter(k => k.length);
-
-                // Convert each to shorthand
                 const shorthandParts = parts.map(k => convertKeywordToShorthand(k));
 
                 const spans = shorthandParts.map(k =>
@@ -213,24 +207,21 @@ headerHTML += `</div>`; // close .card-header
                 return `<span class="wp-keywords-inline">${spans}</span>`;
             }
 
-
-            // Render a weapon section
             function renderWeaponSection(title, groups, isMelee) {
                 let html = `
-        <div class="weapon-header">
-          <span class="wh-title">${title}</span>
-          <span class="wh-stat">R</span>
-          <span class="wh-stat">A</span>
-          <span class="wh-stat">${isMelee ? "WS" : "BS"}</span>
-          <span class="wh-stat">S</span>
-          <span class="wh-stat">AP</span>
-          <span class="wh-stat">D</span>
-        </div>
-        `;
+                    <div class="weapon-header">
+                        <span class="wh-title">${title}</span>
+                        <span class="wh-stat">R</span>
+                        <span class="wh-stat">A</span>
+                        <span class="wh-stat">${isMelee ? "WS" : "BS"}</span>
+                        <span class="wh-stat">S</span>
+                        <span class="wh-stat">AP</span>
+                        <span class="wh-stat">D</span>
+                    </div>
+                `;
 
                 Object.entries(groups).forEach(([baseName, profiles]) => {
 
-                    // MULTI-PROFILE
                     if (profiles.length > 1) {
                         html += `<div class="weapon-parent">${baseName}</div>`;
 
@@ -242,29 +233,24 @@ headerHTML += `</div>`; // close .card-header
                             const range = isMelee ? "M" : w.characteristics.Range;
                             const hitStat = isMelee ? w.characteristics.WS : w.characteristics.BS;
 
-                            // Convert full keywords → shorthand
-                            let kw = w.characteristics.Keywords || "";
-                            let kwList = kw.split(",").map(k => convertKeywordToShorthand(k.trim()));
-                            const keywordHtml = renderKeywordSpans(kwList.join(", "));
-
+                            const keywordHtml = renderKeywordSpans(w.characteristics.Keywords);
 
                             html += `
-                    <div class="weapon-inline-row profile-row">
-                      <div class="wp-name">- ${profileName}
-                        ${keywordHtml}
-                      </div>
-                      <div class="wp-stat">${range}</div>
-                      <div class="wp-stat">${w.characteristics.A}</div>
-                      <div class="wp-stat">${hitStat}</div>
-                      <div class="wp-stat">${w.characteristics.S}</div>
-                      <div class="wp-stat">${w.characteristics.AP}</div>
-                      <div class="wp-stat">${w.characteristics.D}</div>
-                    </div>
-                    `;
+                                <div class="weapon-inline-row profile-row">
+                                    <div class="wp-name">- ${profileName}
+                                        ${keywordHtml}
+                                    </div>
+                                    <div class="wp-stat">${range}</div>
+                                    <div class="wp-stat">${w.characteristics.A}</div>
+                                    <div class="wp-stat">${hitStat}</div>
+                                    <div class="wp-stat">${w.characteristics.S}</div>
+                                    <div class="wp-stat">${w.characteristics.AP}</div>
+                                    <div class="wp-stat">${w.characteristics.D}</div>
+                                </div>
+                            `;
                         });
                     }
 
-                    // SINGLE-PROFILE
                     else {
                         const w = profiles[0];
 
@@ -274,19 +260,19 @@ headerHTML += `</div>`; // close .card-header
                         const keywordHtml = renderKeywordSpans(w.characteristics.Keywords);
 
                         html += `
-                <div class="weapon-inline-row">
-                  <div class="wp-name">
-                    ${baseName}
-                    ${keywordHtml}
-                  </div>
-                  <div class="wp-stat">${range}</div>
-                  <div class="wp-stat">${w.characteristics.A}</div>
-                  <div class="wp-stat">${hitStat}</div>
-                  <div class="wp-stat">${w.characteristics.S}</div>
-                  <div class="wp-stat">${w.characteristics.AP}</div>
-                  <div class="wp-stat">${w.characteristics.D}</div>
-                </div>
-                `;
+                            <div class="weapon-inline-row">
+                                <div class="wp-name">
+                                    ${baseName}
+                                    ${keywordHtml}
+                                </div>
+                                <div class="wp-stat">${range}</div>
+                                <div class="wp-stat">${w.characteristics.A}</div>
+                                <div class="wp-stat">${hitStat}</div>
+                                <div class="wp-stat">${w.characteristics.S}</div>
+                                <div class="wp-stat">${w.characteristics.AP}</div>
+                                <div class="wp-stat">${w.characteristics.D}</div>
+                            </div>
+                        `;
                     }
                 });
 
@@ -306,44 +292,69 @@ headerHTML += `</div>`; // close .card-header
             html += `</div>`;
             card.innerHTML += html;
 
-            // Separator after weapons
             card.innerHTML += `<div class="section-separator"></div>`;
         }
 
-
         // -------------------------------------------------------
-        // ABILITIES
+        // 4. ABILITIES (unique first, generic second)
         // -------------------------------------------------------
 
         const removeRules = [/^Invulnerable Save/i, /^Feel No Pain/i];
 
         function filterAbilities(list) {
-            return list.filter(a => !removeRules.some(r => r.test(a)));
+            return list.filter(a => !removeRules.some(r => r.test(a.name)));
         }
 
         const unique = filterAbilities(unit.uniqueAbilities);
         const generic = filterAbilities(unit.genericAbilities);
 
-        if (unique.length || generic.length) {
-            const uniqueHTML = unique.map(a => `<span class="ability-unique">${a}</span>`).join(", ");
-            const genericHTML = generic.map(a => `<span class="ability-generic">${a}</span>`).join(", ");
+        const showDesc = document.getElementById("showDescriptions")?.checked;
 
+        // UNIQUE abilities
+        let uniqueHTML = "";
+        if (unique.length > 0) {
+            if (showDesc) {
+                uniqueHTML = unique.map(a => `
+                    <div class="ability-unique">
+                        <strong>${a.name}:</strong> 
+                        <span class="ability-desc">${cleanDescription(a.description) || ""}</span>
+                    </div>
+                `).join("");
+            } else {
+                uniqueHTML = `
+                    <div class="ability-unique">
+                        ${unique.map(a => a.name).join(", ")}
+                    </div>
+                `;
+            }
+        }
+
+        // GENERIC abilities (names only)
+        let genericHTML = "";
+        if (generic.length > 0) {
+            genericHTML = `
+                <div class="ability-generic">
+                    ${generic.map(a => a.name).join(", ")}
+                </div>
+            `;
+        }
+
+        if (uniqueHTML || genericHTML) {
             card.innerHTML += `
                 <div class="inline-section">
                     <span class="inline-title">ABILITIES:</span>
-                    ${uniqueHTML}${unique.length && generic.length ? ", " : ""}${genericHTML}
+                    ${uniqueHTML}
+                    ${showDesc && uniqueHTML && genericHTML ? "<br>" : ""}
+                    ${genericHTML}
                 </div>
             `;
             card.innerHTML += `<div class="section-separator"></div>`;
         }
 
-
-
-
-
         // -------------------------------------------------------
-        // INLINE WARGEAR
+        // 5. WARGEAR
         // -------------------------------------------------------
+
         if (unit.wargear.length > 0) {
             const items = unit.wargear.map(w =>
                 w.count > 1 ? `${w.name} ×${w.count}` : w.name
@@ -359,39 +370,54 @@ headerHTML += `</div>`; // close .card-header
             card.innerHTML += `<div class="section-separator"></div>`;
         }
 
-
         // -------------------------------------------------------
-        // 6. ENHANCEMENTS
+        // 6. ENHANCEMENTS (same rules as unique abilities)
         // -------------------------------------------------------
 
         if (unit.enhancements.length > 0) {
-            const items = unit.enhancements.map(e =>
-                e.count > 1 ? `${e.name} ×${e.count}` : e.name
-            );
+            let enhancementsHTML = "";
+
+            if (showDesc) {
+                enhancementsHTML = unit.enhancements.map(e => `
+                    <div class="ability-generic">
+                        <strong>${e.name}:</strong> 
+                        <span class="ability-desc">${cleanDescription(e.description) || ""}</span>
+                    </div>
+                `).join("");
+            } else {
+                enhancementsHTML = `
+                    <div class="ability-generic">
+                        ${unit.enhancements.map(e => e.name).join(", ")}
+                    </div>
+                `;
+            }
 
             card.innerHTML += `
                 <div class="inline-section">
-                <span class="inline-title">ENHANCEMENTS:</span>
-                ${items.join(", ")}
+                    <span class="inline-title">ENHANCEMENTS:</span>
+                    ${enhancementsHTML}
                 </div>
             `;
 
-            // Separator after enhancements
             card.innerHTML += `<div class="section-separator"></div>`;
         }
 
         // -------------------------------------------------------
-        // KEYWORDS (no title, italic text)
+        // 7. KEYWORDS
         // -------------------------------------------------------
+
         if (unit.keywords?.length > 0) {
             card.innerHTML += `
-    <div class="keywords-text">
-      ${unit.keywords.join(", ")}
-    </div>
-  `;
+                <div class="keywords-text">
+                    ${unit.keywords.join(", ")}
+                </div>
+            `;
         }
-
 
         container.appendChild(card);
     });
+
+    // Enable PDF + Description buttons
+    document.getElementById("pdfButton").classList.remove("disabled");
+
 }

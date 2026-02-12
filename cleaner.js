@@ -1,7 +1,6 @@
 let cleanedData = null;
 
 document.getElementById("fileInput").addEventListener("change", handleFile);
-
 function handleFile(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -12,14 +11,19 @@ function handleFile(event) {
     cleanedData = parseRoster(raw);
     window.cleanedData = cleanedData;
 
-    // Show buttons (optional)
-    document.getElementById("download-pdf").style.display = "inline-block";
     document.getElementById("card-placeholder")?.remove();
-    // NEW: automatically render cards
+
     renderCards(cleanedData);
   };
   reader.readAsText(file);
 }
+
+const FORCE_GENERIC = [
+  "Leader",
+  "Supreme Commander",
+  "Bodyguard"
+];
+
 
 /* -------------------------------------------------------
    1. Extract units AND standalone characters
@@ -59,7 +63,6 @@ function parseUnit(unit) {
     name: unit.name,
     keywords: (unit.categories || []).map(c => c.name),
 
-    // NEW separated ability fields
     genericAbilities: extractGenericAbilities(unit),
     uniqueAbilities: extractUniqueAbilities(unit),
 
@@ -73,18 +76,23 @@ function parseUnit(unit) {
 
 /* -------------------------------------------------------
    3. Generic Abilities (from unit.rules)
+   NOW INCLUDES DESCRIPTIONS
 ------------------------------------------------------- */
 function extractGenericAbilities(unit) {
   const abilities = [];
 
-  // 1. Normal generic abilities from unit.rules
   if (unit.rules) {
     unit.rules
       .filter(r => !r.hidden)
-      .forEach(r => abilities.push(r.name.trim()));
+      .forEach(r => {
+        abilities.push({
+          name: r.name.trim(),
+          description: r.description?.trim() || ""
+        });
+      });
   }
 
-  // 2. Transport capacity (if present)
+  // Transport capacity
   if (unit.profiles) {
     const transportProfile = unit.profiles.find(p => p.typeName === "Transport");
 
@@ -92,28 +100,55 @@ function extractGenericAbilities(unit) {
       const cap = transportProfile.characteristics?.find(c => c.name === "Capacity");
 
       if (cap && cap.$text) {
-        // Extract the first number only
         const match = cap.$text.match(/(\d+)/);
         if (match) {
-          abilities.push(`Capacity: ${match[1]}`);
+          abilities.push({
+            name: `Capacity: ${match[1]}`,
+            description: ""
+          });
         }
       }
     }
   }
+  // 3. Forced-generic abilities from profiles
+  if (unit.profiles) {
+    unit.profiles.forEach(p => {
+      if (p.typeName === "Abilities" && FORCE_GENERIC.includes(p.name.trim())) {
+        const desc = p.characteristics?.find(c => c.name === "Description")?.$text || "";
+        abilities.push({
+          name: p.name.trim(),
+          description: desc.trim()
+        });
+      }
+    });
+  }
+
 
   return abilities;
 }
 
-
 /* -------------------------------------------------------
    4. Unique Abilities (profiles of type "Abilities")
+   NOW INCLUDES DESCRIPTIONS
 ------------------------------------------------------- */
 function extractUniqueAbilities(unit) {
   if (!unit.profiles) return [];
+
   return unit.profiles
-    .filter(p => p.typeName === "Abilities")
-    .map(p => p.name.trim());
+    .filter(p =>
+      p.typeName === "Abilities" &&
+      !FORCE_GENERIC.includes(p.name.trim()) // exclude forced-generic abilities
+    )
+    .map(p => {
+      const desc = p.characteristics?.find(c => c.name === "Description")?.$text || "";
+      return {
+        name: p.name.trim(),
+        description: desc.trim()
+      };
+    });
 }
+
+
 
 /* -------------------------------------------------------
    5. Characteristics (dedupe by stats)
@@ -290,6 +325,7 @@ function extractWargear(unit) {
 
 /* -------------------------------------------------------
    8. Enhancements
+   NOW INCLUDES DESCRIPTIONS
 ------------------------------------------------------- */
 function extractEnhancements(unit) {
   const enhancements = [];
@@ -304,8 +340,12 @@ function extractEnhancements(unit) {
         sel.group.toLowerCase().includes("enhancement");
 
       if (isEnhancement) {
+        const desc =
+          sel.profiles?.[0]?.characteristics?.find(c => c.name === "Description")?.$text || "";
+
         enhancements.push({
           name: sel.name,
+          description: desc.trim(),
           count: 1,
           cost: sel.costs?.find(c => c.name === "pts")?.value || null
         });
@@ -339,9 +379,6 @@ function extractComposition(unit) {
   return `${total} models`;
 }
 
-
-
-
 /* -------------------------------------------------------
    10. Full pipeline
 ------------------------------------------------------- */
@@ -353,7 +390,7 @@ function parseRoster(json) {
 /* -------------------------------------------------------
    11. Download cleaned JSON
 ------------------------------------------------------- */
-document.getElementById("downloadBtn").addEventListener("click", () => {
+document.getElementById("downloadBtn")?.addEventListener("click", () => {
   const blob = new Blob([JSON.stringify(cleanedData, null, 2)], {
     type: "application/json"
   });
@@ -365,3 +402,8 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
   a.click();
   URL.revokeObjectURL(url);
 });
+
+document.getElementById("showDescriptions")?.addEventListener("change", () => {
+  if (cleanedData) renderCards(cleanedData);
+});
+

@@ -1,13 +1,16 @@
-document.getElementById("download-pdf").addEventListener("click", async () => {
+document.getElementById("pdfButton").addEventListener("click", async (e) => {
+  if (e.currentTarget.classList.contains("disabled")) return;
+
   const overlay = document.getElementById("loading-overlay");
-  overlay.style.display = "flex"; // Show loading screen
+  overlay.style.display = "flex";
 
   try {
     await generatePDF();
   } finally {
-    overlay.style.display = "none"; // Hide loading screen
+    overlay.style.display = "none";
   }
 });
+
 async function generatePDF() {
   const { jsPDF } = window.jspdf;
 
