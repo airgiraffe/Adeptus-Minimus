@@ -387,23 +387,4 @@ function parseRoster(json) {
   return units.map(parseUnit);
 }
 
-/* -------------------------------------------------------
-   11. Download cleaned JSON
-------------------------------------------------------- */
-document.getElementById("downloadBtn")?.addEventListener("click", () => {
-  const blob = new Blob([JSON.stringify(cleanedData, null, 2)], {
-    type: "application/json"
-  });
-
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "cleaned_roster.json";
-  a.click();
-  URL.revokeObjectURL(url);
-});
-
-document.getElementById("showDescriptions")?.addEventListener("change", () => {
-  if (cleanedData) renderCards(cleanedData);
-});
 

@@ -419,5 +419,7 @@ function renderCards(data) {
 
     // Enable PDF + Description buttons
     document.getElementById("pdfButton").classList.remove("disabled");
+    document.getElementById("descToggle").classList.remove("disabled");
+
 
 }

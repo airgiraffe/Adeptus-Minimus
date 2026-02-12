@@ -16,6 +16,11 @@ function decodeListForgeData(encodedString) {
 
 window.addEventListener("DOMContentLoaded", () => {
     const hash = window.location.hash;
+    const toggle = document.getElementById("descToggle");
+    
+    toggle.addEventListener("change", () => {
+        document.body.classList.toggle("show-descriptions", toggle.checked);
+    });    
 
     if (hash.startsWith("#/listforge-json/")) {
         const encoded = hash.substring("#/listforge-json/".length);
