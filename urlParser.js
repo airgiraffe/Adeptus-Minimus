@@ -25,7 +25,6 @@ window.addEventListener("DOMContentLoaded", () => {
         renderCards(cleaned);
 
         document.getElementById("pdfButton").classList.remove("disabled");
-        document.getElementById("descToggle").classList.remove("disabled");
     }
 });
 
