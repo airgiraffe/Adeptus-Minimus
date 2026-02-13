@@ -428,14 +428,38 @@ function populateKeywordTable() {
     const table = document.getElementById("keywordTable");
     if (!table) return;
 
-    // Convert the map into an array of { keyword, shorthand }
+    // Base entries from the shorthand map, excluding "Anti"
     const entries = Object.entries(keywordShorthand)
-        .map(([keyword, shorthand]) => ({ keyword, shorthand }))
-        .sort((a, b) => a.keyword.localeCompare(b.keyword));
+        .filter(([keyword]) => keyword !== "Anti")   
+        .map(([keyword, shorthand]) => ({ keyword, shorthand }));
 
-    // Build the table HTML
+
+    // Add Anti-X variants
+    const antiTargets = {
+        "Infantry": "I",
+        "Vehicle": "V",
+        "Monster": "M",
+        "Fly": "F",
+        "Character": "C",
+        "Psyker": "P",
+        "Titanic": "T"
+    };
+
+    Object.entries(antiTargets).forEach(([target, letter]) => {
+        entries.push({
+            keyword: `Anti-${target}`,
+            shorthand: `A-${letter}`
+        });
+    });
+
+    // Sort alphabetically by keyword
+    entries.sort((a, b) => a.keyword.localeCompare(b.keyword));
+
+    // Build table HTML
     let html = `
         <tr>
+            <th>Keyword</th>
+            <th>Shorthand</th>
         </tr>
     `;
 
@@ -450,3 +474,4 @@ function populateKeywordTable() {
 
     table.innerHTML = html;
 }
+

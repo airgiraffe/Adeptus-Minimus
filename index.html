@@ -64,22 +64,24 @@
 
   <div id="help-overlay">
     <div class="help-panel">
-      <h2>How to Use Adeptus Minimus</h2>
+      <div class="help-content">
+        <h2>How to Use Adeptus Minimus</h2>
 
-      <p><strong>1. Upload a ListForge JSON</strong><br>
-        Use “Initiate Data Uplink” to load a roster exported from ListForge. Or use the integration within the Listforge
-        app.</p>
+        <p><strong>1. Upload a ListForge JSON</strong><br>
+          Use “Initiate Data Uplink” to load a roster exported from ListForge. Or use the integration within the
+          Listforge
+          app.</p>
 
-      <p><strong>2. Toggle Descriptions</strong><br>
-        “Expose Descriptions” shows or hides ability and enhancement text.</p>
+        <p><strong>2. Toggle Descriptions</strong><br>
+          “Expose Descriptions” shows or hides ability and enhancement text.</p>
 
-      <p><strong>3. Generate a PDF</strong><br>
-        “Forge PDF Cards” exports all rendered cards as a printable PDF.</p>
+        <p><strong>3. Generate a PDF</strong><br>
+          “Forge PDF Cards” exports all rendered cards as a printable PDF.</p>
 
-      <h3>Weapon Keyword Shorthand</h3>
+        <h3>Weapon Keyword Shorthand</h3>
 
-      <table class="help-table" id="keywordTable"></table>
-
+        <table class="help-table" id="keywordTable"></table>
+      </div>
       <button id="helpClose" class="help-close">Close</button>
     </div>
   </div>
@@ -89,7 +91,7 @@
   <script src="urlParser.js"></script>
   <script src="cards.js"></script>
   <script src="print.js"></script>
-  
+
   <script>
     document.getElementById("showDescriptions").addEventListener("change", () => {
       if (cleanedData) {
@@ -99,8 +101,14 @@
 
     document.getElementById("helpButton").addEventListener("click", () => {
       populateKeywordTable();
-      document.getElementById("help-overlay").style.display = "flex";
+      const overlay = document.getElementById("help-overlay");
+      overlay.style.display = "flex";
+
+      // NEW: reset scroll to top
+      const panel = document.querySelector(".help-panel");
+      panel.scrollTop = 0;
     });
+
 
     document.getElementById("helpClose").addEventListener("click", () => {
       document.getElementById("help-overlay").style.display = "none";
