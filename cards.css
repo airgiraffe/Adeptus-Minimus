@@ -596,3 +596,14 @@ html, body { overflow-x: hidden; }
         padding: 10px 0;
     }
 }
+
+@media (hover: none) {
+    .button-shell:hover .button-surface {
+        /* Disable hover glow on touch devices */
+        border-color: var(--button-border);
+        color: var(--white);
+        box-shadow:
+            inset 0 0 8px rgba(120,152,255,0.25),
+            0 0 6px rgba(0,0,0,0.4);
+    }
+}
