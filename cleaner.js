@@ -389,8 +389,13 @@ function extractComposition(unit) {
    10. Full pipeline
 ------------------------------------------------------- */
 function parseRoster(json) {
-  const units = extractUnits(json);
-  return units.map(parseUnit);
+  const units = extractUnits(json).map(parseUnit);
+
+  // Attach roster name onto the cleaned array
+  units.rosterName = json.roster?.name || null;
+
+  return units;
 }
+
 
 

@@ -21,7 +21,7 @@ const keywordShorthand = {
     "Twin-linked": "TL",
     "Pistol": "Pi",
     "Torrent": "To",
-    "Lethal Hits": "Lethal",
+    "Lethal Hits": "L",
     "Lance": "La",
     "Indirect Fire": "IF",
     "Precision": "Pr",
@@ -422,4 +422,31 @@ function renderCards(data) {
     document.getElementById("descToggle").classList.remove("disabled");
 
 
+}
+
+function populateKeywordTable() {
+    const table = document.getElementById("keywordTable");
+    if (!table) return;
+
+    // Convert the map into an array of { keyword, shorthand }
+    const entries = Object.entries(keywordShorthand)
+        .map(([keyword, shorthand]) => ({ keyword, shorthand }))
+        .sort((a, b) => a.keyword.localeCompare(b.keyword));
+
+    // Build the table HTML
+    let html = `
+        <tr>
+        </tr>
+    `;
+
+    entries.forEach(entry => {
+        html += `
+            <tr>
+                <td>${entry.keyword}</td>
+                <td>${entry.shorthand}</td>
+            </tr>
+        `;
+    });
+
+    table.innerHTML = html;
 }

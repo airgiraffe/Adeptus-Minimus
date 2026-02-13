@@ -75,5 +75,16 @@ async function generatePDF() {
     );
   }
 
-  pdf.save("AdeptusMinimus.pdf");
+
+const rosterName =
+  (cleanedData && cleanedData.rosterName) ||
+  "AdeptusMinimus";
+
+const safeName = rosterName
+  .toString()
+  .replace(/[^a-z0-9_\- ]/gi, "")
+  .trim() || "AdeptusMinimus";
+
+pdf.save(`${safeName}.pdf`);
+
 }
