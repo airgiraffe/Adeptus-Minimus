@@ -363,10 +363,10 @@ html, body { overflow-x: hidden; }
 }
 
 .wp-keywords-inline {
+    display: inline-block; white-space: nowrap; 
     font-family: "Inter Tight", sans-serif;
     font-size: 9px;
     color: var(--accent);
-    margin-left: 4px;
 }
 
 .weapon-inline-row {

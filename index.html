@@ -102,13 +102,11 @@
       descCheckbox.setAttribute('aria-checked', descCheckbox.checked);
     }
 
-    // keep visual state + label in sync on load
-    descToggle.classList.toggle("active", descCheckbox.checked);
+    // keep label in sync on load (no visual 'active' state)
     updateDescLabel();
 
-    // primary: sync when the checkbox value changes
+    // primary: sync when the checkbox value changes (text only)
     descCheckbox.addEventListener("change", () => {
-      descToggle.classList.toggle("active", descCheckbox.checked);
       updateDescLabel();
 
       if (cleanedData) {
@@ -116,11 +114,10 @@
       }
     });
 
-    // mobile/touch robustness: also sync after label clicks (native toggle may be delayed on some browsers)
+    // mobile/touch robustness: also sync label after label clicks
     descToggle.addEventListener("click", () => {
       // allow native checkbox state to update first
       setTimeout(() => {
-        descToggle.classList.toggle("active", descCheckbox.checked);
         updateDescLabel();
 
         if (cleanedData) {

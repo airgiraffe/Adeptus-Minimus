@@ -71,7 +71,7 @@ function convertKeywordToShorthand(keyword) {
         return value ? `A-${letter}${value}` : `A-${letter}`;
     }
 
-    const match = keyword.match(/^(.*?)(\d[\d\+]*)$/);
+    const match = keyword.match(/^(.*?)([Dd]?\d[\d\+]*)$/);
     if (match) {
         const base = match[1].trim();
         const num = match[2].trim();
@@ -81,6 +81,45 @@ function convertKeywordToShorthand(keyword) {
 
     return keywordShorthand[keyword] || keyword;
 }
+
+function extractAllWeaponKeywords(w) {
+    const results = [];
+
+    // 1. Keywords directly on the weapon
+    if (w.characteristics?.Keywords) {
+        const raw = w.characteristics.Keywords.split(",")
+            .map(k => k.trim())
+            .filter(Boolean);
+        results.push(...raw);
+    }
+
+    // 2. Abilities that behave like keywords
+    if (Array.isArray(w.abilities)) {
+        w.abilities.forEach(ab => {
+            if (!ab) return;
+
+            // Ability name
+            if (ab.name) {
+                let kw = ab.name.trim();
+
+                // Append value if present (e.g., "Sustained Hits 1")
+                if (ab.value) {
+                    kw += " " + String(ab.value).trim();
+                }
+
+                results.push(kw);
+            }
+
+            // Some exports use "rule" or "text"
+            if (ab.rule) results.push(ab.rule.trim());
+            if (ab.text) results.push(ab.text.trim());
+        });
+    }
+
+    // 3. Deduplicate
+    return [...new Set(results)];
+}
+
 
 function renderCards(data) {
     const container = document.getElementById("card-inner");
@@ -233,7 +272,9 @@ function renderCards(data) {
                             const range = isMelee ? "M" : w.characteristics.Range;
                             const hitStat = isMelee ? w.characteristics.WS : w.characteristics.BS;
 
-                            const keywordHtml = renderKeywordSpans(w.characteristics.Keywords);
+                            const allKeywords = extractAllWeaponKeywords(w).join(", ");
+                            const keywordHtml = renderKeywordSpans(allKeywords);
+
 
                             html += `
                                 <div class="weapon-inline-row profile-row">
@@ -257,7 +298,9 @@ function renderCards(data) {
                         const range = isMelee ? "M" : w.characteristics.Range;
                         const hitStat = isMelee ? w.characteristics.WS : w.characteristics.BS;
 
-                        const keywordHtml = renderKeywordSpans(w.characteristics.Keywords);
+                        const allKeywords = extractAllWeaponKeywords(w).join(", ");
+                        const keywordHtml = renderKeywordSpans(allKeywords);
+
 
                         html += `
                             <div class="weapon-inline-row">
@@ -430,7 +473,7 @@ function populateKeywordTable() {
 
     // Base entries from the shorthand map, excluding "Anti"
     const entries = Object.entries(keywordShorthand)
-        .filter(([keyword]) => keyword !== "Anti")   
+        .filter(([keyword]) => keyword !== "Anti")
         .map(([keyword, shorthand]) => ({ keyword, shorthand }));
 
 
