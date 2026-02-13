@@ -185,7 +185,7 @@ html, body { overflow-x: hidden; }
 }
 
 /* Toggle ON glow */
-.button-shell:has(input[type="checkbox"]:checked) .button-surface {
+.button-shell.active .button-surface {
     border-color: var(--light-blue);
     color: var(--light-blue);
     box-shadow:
@@ -193,9 +193,9 @@ html, body { overflow-x: hidden; }
         0 0 10px rgba(120,152,255,0.25);
 }
 
+
 /* Hide real inputs */
-.button-shell input[type="file"],
-.button-shell input[type="checkbox"] {
+.button-shell input[type="file"] {
     display: none;
 }
 

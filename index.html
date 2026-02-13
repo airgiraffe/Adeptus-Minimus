@@ -93,11 +93,19 @@
   <script src="print.js"></script>
 
   <script>
-    document.getElementById("showDescriptions").addEventListener("change", () => {
+    const descToggle = document.getElementById("descToggle");
+    const descCheckbox = document.getElementById("showDescriptions");
+
+    descCheckbox.addEventListener("change", () => {
+      // NEW: update visual state reliably on all browsers
+      descToggle.classList.toggle("active", descCheckbox.checked);
+
+      // existing behaviour
       if (cleanedData) {
         renderCards(cleanedData);
       }
     });
+
 
     document.getElementById("helpButton").addEventListener("click", () => {
       populateKeywordTable();
