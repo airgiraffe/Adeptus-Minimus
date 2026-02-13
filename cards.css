@@ -91,7 +91,7 @@ html, body { overflow-x: hidden; }
 .site-header {
     width: 100%;
     background: var(--surface-header);
-    padding: 20px;
+    padding-bottom: 20px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     position: relative;
     overflow: hidden;
@@ -575,7 +575,7 @@ html, body { overflow-x: hidden; }
         flex-direction: column;
         align-items: stretch;
         gap: 10px;
-        width: 100%;
+        width: 80%;
     }
 
     .button-shell {
