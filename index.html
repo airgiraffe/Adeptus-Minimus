@@ -62,7 +62,13 @@
   <script src="urlParser.js"></script>
   <script src="cards.js"></script>
   <script src="print.js"></script>
-
-</body>
+  <script>
+    document.getElementById("showDescriptions").addEventListener("change", () => {
+    if (cleanedData) {
+        renderCards(cleanedData);
+    }
+});
+  </script>
+  </body>
 
 </html>

@@ -8,6 +8,10 @@ function handleFile(event) {
   const reader = new FileReader();
   reader.onload = () => {
     const raw = JSON.parse(reader.result);
+
+    // NEW: store raw roster globally
+    currentRoster = raw;
+
     cleanedData = parseRoster(raw);
     window.cleanedData = cleanedData;
 
@@ -15,6 +19,8 @@ function handleFile(event) {
 
     renderCards(cleanedData);
   };
+
+
   reader.readAsText(file);
 }
 

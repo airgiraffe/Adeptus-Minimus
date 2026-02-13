@@ -18,17 +18,25 @@ function decodeListForgeData(encodedString) {
 
 window.addEventListener("DOMContentLoaded", () => {
     const hash = window.location.hash;
-    const descToggle = document.getElementById("showDescriptions");
-    
 
     if (hash.startsWith("#/listforge-json/")) {
         const encoded = hash.substring("#/listforge-json/".length);
 
         const json = decodeListForgeData(encoded);
+
+        // NEW: store raw roster globally
+        currentRoster = json;
+
         const cleaned = parseRoster(json);
+
+        // NEW: store cleaned roster globally too
+        cleanedData = cleaned;
+        window.cleanedData = cleaned;
+
         renderCards(cleaned);
 
         document.getElementById("pdfButton").classList.remove("disabled");
     }
 });
+
 
