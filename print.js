@@ -75,5 +75,5 @@ async function generatePDF() {
     );
   }
 
-  pdf.save("warhammer-cards.pdf");
+  pdf.save("AdeptusMinimus.pdf");
 }

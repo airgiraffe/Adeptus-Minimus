@@ -1,3 +1,5 @@
+let currentRoster = null;
+
 function decodeListForgeData(encodedString) {
     // 1. Base64 decode → bytes
     const binaryString = atob(encodedString);
@@ -16,11 +18,8 @@ function decodeListForgeData(encodedString) {
 
 window.addEventListener("DOMContentLoaded", () => {
     const hash = window.location.hash;
-    const toggle = document.getElementById("descToggle");
+    const descToggle = document.getElementById("showDescriptions");
     
-    toggle.addEventListener("change", () => {
-        document.body.classList.toggle("show-descriptions", toggle.checked);
-    });    
 
     if (hash.startsWith("#/listforge-json/")) {
         const encoded = hash.substring("#/listforge-json/".length);
