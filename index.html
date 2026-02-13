@@ -95,15 +95,38 @@
   <script>
     const descToggle = document.getElementById("descToggle");
     const descCheckbox = document.getElementById("showDescriptions");
+    const descLabel = descToggle.querySelector('.button-surface');
 
+    function updateDescLabel() {
+      descLabel.textContent = descCheckbox.checked ? 'Hide Descriptions' : 'Expose Descriptions';
+      descCheckbox.setAttribute('aria-checked', descCheckbox.checked);
+    }
+
+    // keep visual state + label in sync on load
+    descToggle.classList.toggle("active", descCheckbox.checked);
+    updateDescLabel();
+
+    // primary: sync when the checkbox value changes
     descCheckbox.addEventListener("change", () => {
-      // NEW: update visual state reliably on all browsers
       descToggle.classList.toggle("active", descCheckbox.checked);
+      updateDescLabel();
 
-      // existing behaviour
       if (cleanedData) {
         renderCards(cleanedData);
       }
+    });
+
+    // mobile/touch robustness: also sync after label clicks (native toggle may be delayed on some browsers)
+    descToggle.addEventListener("click", () => {
+      // allow native checkbox state to update first
+      setTimeout(() => {
+        descToggle.classList.toggle("active", descCheckbox.checked);
+        updateDescLabel();
+
+        if (cleanedData) {
+          renderCards(cleanedData);
+        }
+      }, 0);
     });
 
 
